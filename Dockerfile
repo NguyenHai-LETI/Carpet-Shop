@@ -4,11 +4,14 @@ FROM eclipse-temurin:21-jdk
 # Thiết lập thư mục làm việc
 WORKDIR /app
 
-# Copy file Maven Wrapper và pom.xml để cache dependencies
+# Copy Maven Wrapper và pom.xml để cache dependencies
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
 
-# Download dependencies
+# Cấp quyền thực thi cho mvnw
+RUN chmod +x mvnw
+
+# Tải dependencies offline
 RUN ./mvnw dependency:go-offline -B
 
 # Copy toàn bộ source và build
@@ -19,8 +22,8 @@ RUN ./mvnw clean package -DskipTests -B
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
 
-# Mở port (giống server.port trong application.properties, mặc định 8080)
+# Mở port (mặc định 8080)
 EXPOSE 8080
 
 # Command để chạy ứng dụng
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]
