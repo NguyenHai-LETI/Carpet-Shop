@@ -1,29 +1,31 @@
 # Sử dụng JDK 21
 FROM eclipse-temurin:21-jdk
 
-# Thiết lập thư mục làm việc
 WORKDIR /app
 
-# Copy Maven Wrapper và pom.xml để cache dependencies
+# Copy Maven Wrapper và pom.xml
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
 
-# Cấp quyền thực thi cho mvnw
+# Cho phép chạy mvnw
 RUN chmod +x mvnw
 
-# Tải dependencies offline
+# Thiết lập Maven dùng UTF-8
+ENV MAVEN_OPTS="-Dproject.build.sourceEncoding=UTF-8 -Dproject.reporting.outputEncoding=UTF-8"
+
+# Tải offline dependencies
 RUN ./mvnw dependency:go-offline -B
 
-# Copy toàn bộ source và build
+# Copy source
 COPY src src
+
+# Build package, skip tests
 RUN ./mvnw clean package -DskipTests -B
 
-# Runtime: copy jar đã build
+# Copy jar để chạy
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
 
-# Mở port (mặc định 8080)
 EXPOSE 8080
 
-# Command để chạy ứng dụng
 ENTRYPOINT ["java", "-jar", "/app.jar"]
