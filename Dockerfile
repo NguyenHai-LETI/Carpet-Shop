@@ -1,35 +1,34 @@
-# 1) Chọn base image với JDK 21
-FROM eclipse-temurin:21-jdk
+# --------- Stage 1: Build ---------
+FROM eclipse-temurin:21-jdk AS builder
 
-# 2) Thiết lập locale sang UTF-8 để Maven đọc resources đúng encoding
+# Thiết lập locale và Maven options
 ENV LANG=C.UTF-8
 ENV MAVEN_OPTS="-Dproject.build.sourceEncoding=UTF-8 -Dproject.reporting.outputEncoding=UTF-8"
 
-# 3) Thư mục làm việc trong container
 WORKDIR /app
 
-# 4) Copy Maven Wrapper và pom.xml để cache dependencies trước
+# Copy Maven Wrapper và pom.xml để cache dependencies
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
-
-# 5) Cấp quyền thực thi cho mvnw
 RUN chmod +x mvnw
 
-# 6) Tải offline dependencies (tối ưu build)
+# Tải dependencies offline
 RUN ./mvnw dependency:go-offline -B
 
-# 7) Copy toàn bộ source code
+# Copy source code và build
 COPY src src
-
-# 8) Build package, skip tests và bỏ resource filtering
 RUN ./mvnw clean package -DskipTests -Dmaven.resources.skip=true -B
 
-# 9) Copy file JAR đã build ra để chạy
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
+# --------- Stage 2: Runtime ---------
+FROM eclipse-temurin:21-jdk
 
-# 10) Mở port 8080 (theo mặc định Spring Boot)
+WORKDIR /app
+
+# Copy file JAR từ stage 'builder'
+COPY --from=builder /app/target/*.jar app.jar
+
+# Mở port 8080
 EXPOSE 8080
 
-# 11) Command để khởi chạy Spring Boot app
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+# Chạy ứng dụng
+ENTRYPOINT ["java", "-jar", "app.jar"]
