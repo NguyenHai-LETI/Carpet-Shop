@@ -21,8 +21,8 @@ RUN ./mvnw dependency:go-offline -B
 # 7) Copy toàn bộ source code
 COPY src src
 
-# 8) Build package, skip tests
-RUN ./mvnw clean package -DskipTests -B
+# 8) Build package, skip tests và bỏ resource filtering
+RUN ./mvnw clean package -DskipTests -Dmaven.resources.skip=true -B
 
 # 9) Copy file JAR đã build ra để chạy
 ARG JAR_FILE=target/*.jar
