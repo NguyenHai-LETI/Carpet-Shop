@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/carpets")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://carpetshop.netlify.app/")
 public class AdminCarpetController {
 
     @Autowired

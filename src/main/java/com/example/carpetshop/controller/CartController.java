@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cart")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://carpetshop.netlify.app/")
 public class CartController {
 
     @Autowired

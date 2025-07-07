@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/carpets")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://carpetshop.netlify.app/")
 public class CarpetController {
 
     @Autowired

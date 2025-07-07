@@ -20,6 +20,6 @@ public class LoginController {
     // ✅ Tuỳ chọn: chuyển hướng về frontend sau khi login thành công
     @GetMapping("/success")
     public void redirectAfterLogin(HttpServletResponse response) throws IOException {
-        response.sendRedirect("http://localhost:3000/oauth2-success"); // React route sau khi login
+        response.sendRedirect("http://https://carpetshop.netlify.app/oauth2-success"); // React route sau khi login
     }
 }
