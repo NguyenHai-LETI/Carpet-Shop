@@ -38,10 +38,11 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng"));
 
         // Sử dụng User từ Spring Security (org.springframework.security.core.userdetails.User)
+        String password = user.getHashPassword() != null ? user.getHashPassword() : "";
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
-                .password(user.getHashPassword())
-                .roles(user.getRole().name()) // Dùng ROLE_USER hoặc ROLE_ADMIN
+                .password(password)
+                .roles(user.getRole().name())
                 .build();
     }
 
