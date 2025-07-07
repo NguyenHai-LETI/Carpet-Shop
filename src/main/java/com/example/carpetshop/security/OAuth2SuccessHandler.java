@@ -60,7 +60,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
 
         // Redirect về frontend
-        String redirectUrl = "https://carpetshop.netlify.apps/oauth-success?token=" + token;
+        String redirectUrl = "https://carpetshop.netlify.app/oauth-success?token=" + token;
         response.sendRedirect(redirectUrl);
     }
 }
