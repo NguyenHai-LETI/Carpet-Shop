@@ -5,6 +5,7 @@ import com.example.carpetshop.security.OAuth2SuccessHandler;
 import com.example.carpetshop.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -21,10 +22,15 @@ import org.springframework.web.cors.*;
 import java.util.List;
 
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
-
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
+
+    @Value("${frontend.origin}")
+    private String frontendOrigin;
+
+    @Autowired
+    private OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -39,60 +45,58 @@ public class SecurityConfig {
         return filter;
     }
 
-    @Autowired
-    private OAuth2SuccessHandler oAuth2SuccessHandler;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
 
-                //custom exception to return 401 Error, instead of redirect to google authentication
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             String path = request.getRequestURI();
                             if (path.startsWith("/api/")) {
-                                // Với API, trả về 401 JSON, không redirect
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                             } else {
-                                // Với UI, redirect sang Google OAuth
                                 response.sendRedirect("/oauth2/authorization/google");
                             }
                         })
                 )
+
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:3000","https://carpetshop.netlify.app"));
+                    config.setAllowedOrigins(List.of(frontendOrigin));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
-                    config.setAllowCredentials(true); // Đảm bảo cho phép cookie hoặc header Authorization
+                    config.setAllowCredentials(true);
                     return config;
                 }))
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/login",       // Login API
+                                "/api/login",
                                 "/oauth2/**",
-                                "/login/oauth2/**",     // OAuth login
-                                "/api/register",    // Register
-                                "/api/reset-password", // Reset password
-                                "/api/carpets/**",  // Public carpet data
-                                "/css/**", "/js/**", "/img/**","/",
-                                "/error"
-                        ).permitAll()  // Cho phép các API public
-
+                                "/login/oauth2/**",
+                                "/api/register",
+                                "/api/reset-password",
+                                "/api/carpets/**",
+                                "api/carpets/*",
+                                "/css/**", "/js/**", "/img/**", "/", "/error"
+                        ).permitAll()
                         .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .anyRequest().authenticated()
+                )
 
-                        .anyRequest().authenticated() // Các yêu cầu còn lại phải xác thực
-                )
                 .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oAuth2SuccessHandler) // Gán handler vào đây
+                        .successHandler(oAuth2SuccessHandler)
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless session
+
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {

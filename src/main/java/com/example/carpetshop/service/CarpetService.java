@@ -11,6 +11,7 @@ import com.example.carpetshop.entity.CarpetOption;
 import com.example.carpetshop.repository.CarpetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ public class CarpetService {
     @Autowired
     private CarpetRepository carpetRepository;
 
+    @Transactional
     public CarpetDetailDTO getCarpetDetailById(Long id) {
         Carpet carpet = carpetRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thảm"));

@@ -7,6 +7,7 @@ import com.example.carpetshop.util.JwtUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -21,6 +22,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+
+    @Value("${frontend.origin}")
+    private String frontendOrigin;
 
     public OAuth2SuccessHandler(JwtUtil jwtUtil, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
@@ -60,7 +64,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
 
         // Redirect về frontend
-        String redirectUrl = "https://carpetshop.netlify.app/oauth-success?token=" + token;
+        String redirectUrl = frontendOrigin + "/oauth-success?token=" + token;
         response.sendRedirect(redirectUrl);
     }
 }

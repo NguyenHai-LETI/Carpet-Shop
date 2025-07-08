@@ -2,13 +2,18 @@ package com.example.carpetshop.service;
 
 import com.example.carpetshop.dto.CartItemDTO;
 import com.example.carpetshop.dto.CartItemRequest;
-import com.example.carpetshop.entity.*;
-import com.example.carpetshop.repository.*;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import com.example.carpetshop.entity.CartItem;
+import com.example.carpetshop.entity.CarpetOption;
+import com.example.carpetshop.entity.User;
+import com.example.carpetshop.repository.CartItemRepository;
+import com.example.carpetshop.repository.CarpetOptionRepository;
+import com.example.carpetshop.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.stream.Collectors;
 
 @Service
 public class CartItemService {
@@ -25,93 +30,75 @@ public class CartItemService {
     @Transactional
     public void addToCart(CartItemRequest request) {
         if (request.getQuantity() <= 0) {
-            throw new IllegalArgumentException("Số lượng phải lớn hơn 0");
+            throw new IllegalArgumentException("Quantity must be greater than 0");
         }
 
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         CarpetOption variant = carpetOptionRepository.findById(request.getVariantId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy biến thể sản phẩm"));
+                .orElseThrow(() -> new RuntimeException("Product variant not found"));
 
-        CartItem existingItem = cartItemRepository
-                .findByUserUserIdAndVariantId(request.getUserId(), request.getVariantId())
-                .orElse(null);
-
-        if (existingItem != null) {
-            existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
-            cartItemRepository.save(existingItem);
-        } else {
-            CartItem newItem = new CartItem();
-            newItem.setUser(user);
-            newItem.setVariant(variant);
-            newItem.setQuantity(request.getQuantity());
-            cartItemRepository.save(newItem);
-        }
+        cartItemRepository.findByUserUserIdAndVariantId(request.getUserId(), request.getVariantId())
+                .ifPresentOrElse(existing -> {
+                    existing.setQuantity(existing.getQuantity() + request.getQuantity());
+                    cartItemRepository.save(existing);
+                }, () -> {
+                    CartItem newItem = new CartItem();
+                    newItem.setUser(user);
+                    newItem.setVariant(variant);
+                    newItem.setQuantity(request.getQuantity());
+                    cartItemRepository.save(newItem);
+                });
     }
 
-    // (Tuỳ chọn) lấy danh sách sản phẩm trong giỏ hàng theo user
+    @org.springframework.transaction.annotation.Transactional
     public List<CartItemDTO> getCartItemsByUserDTO(Long userId) {
-        List<CartItem> items = cartItemRepository.findByUser_UserId(userId);
-
-        return items.stream().map(item -> {
+        return cartItemRepository.findByUser_UserId(userId).stream().map(item -> {
             CarpetOption variant = item.getVariant();
-            CarpetColorOption colorOption = variant.getCarpetColorOption();
-
-            // In ra các ảnh của sản phẩm để kiểm tra
-            System.out.println("🧵 CarpetColorOption ID: " + colorOption.getId());
-            colorOption.getImages().forEach(img ->
-                    System.out.println("🖼️ Img URL: " + img.getUrl() + " | hover: " + img.isHover())
-            );
-
-            Carpet carpet = colorOption.getCarpet();
+            var colorOption = variant.getCarpetColorOption();
+            var carpet = colorOption.getCarpet();
 
             String imageUrl = carpet.getColorOptions().stream()
                     .flatMap(opt -> opt.getImages().stream())
-                    .filter(Img::isHover)
-                    .map(Img::getUrl)
+                    .filter(img -> img.isHover())
+                    .map(img -> img.getUrl())
                     .findFirst()
                     .orElse(null);
 
-
-            System.out.println("✅ imageUrl được chọn: " + imageUrl);
-
             return new CartItemDTO(
                     item.getId(),
-                    colorOption.getCarpet().getName(),
+                    carpet.getName(),
                     variant.getSize().getValue(),
                     colorOption.getColor().getValue(),
                     item.getQuantity(),
                     variant.getPrice(),
                     imageUrl
             );
-        }).toList();
+        }).collect(Collectors.toList());
     }
 
-
-
-    @Transactional
+    @org.springframework.transaction.annotation.Transactional
     public void updateQuantity(Long itemId, Integer newQuantity) {
         CartItem item = cartItemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm trong giỏ"));
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
         if (newQuantity <= 0) {
-            cartItemRepository.delete(item); // hoặc xử lý khác tuỳ bạn
+            cartItemRepository.delete(item);
         } else {
             item.setQuantity(newQuantity);
             cartItemRepository.save(item);
         }
     }
 
-    @Transactional
+    @org.springframework.transaction.annotation.Transactional
     public void deleteItem(Long itemId) {
         cartItemRepository.deleteById(itemId);
     }
 
     @Transactional
     public void clearCartByUserId(Long userId) {
-        List<CartItem> items = cartItemRepository.findByUser_UserId(userId);
+        var items = cartItemRepository.findByUser_UserId(userId);
         cartItemRepository.deleteAll(items);
     }
-
 }

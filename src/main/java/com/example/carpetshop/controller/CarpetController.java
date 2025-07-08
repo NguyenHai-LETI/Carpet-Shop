@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/carpets")
-@CrossOrigin(origins = "https://carpetshop.netlify.app/")
 public class CarpetController {
 
     @Autowired
@@ -52,9 +51,9 @@ public class CarpetController {
 
         try {
             String jsonOutput = objectMapper.writeValueAsString(filtered);
-            logger.info("✅ JSON trả về từ /filter: {}", jsonOutput);
+            logger.info("JSON trả về từ /filter: {}", jsonOutput);
         } catch (JsonProcessingException e) {
-            logger.error("❌ Không thể log JSON kết quả /filter", e);
+            logger.error("Không thể log JSON kết quả /filter", e);
         }
         return ResponseEntity.ok(filtered);
     }

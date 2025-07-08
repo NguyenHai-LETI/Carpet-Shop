@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/admin/carpets")
-@CrossOrigin(origins = "https://carpetshop.netlify.app/")
 public class AdminCarpetController {
 
     @Autowired
