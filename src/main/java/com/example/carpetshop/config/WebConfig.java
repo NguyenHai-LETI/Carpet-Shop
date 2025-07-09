@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
         if (allowedOrigins == null || allowedOrigins.isEmpty()) {
-            allowedOrigins = "https://carpetshop-fe.netlify.app,http://localhost:3000"; // fallback
+            allowedOrigins = "https://carpetshop.netlify.app,http://localhost:3000"; // fallback
         }
         
         registry.addMapping("/**")
