@@ -39,7 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 || path.startsWith("/api/register")
                 || path.startsWith("/api/reset-password")
                 || path.startsWith("/oauth2")
-                || path.startsWith("/login/oauth2/**")
+                || path.startsWith("/api/oauth2")
+                || path.startsWith("/login/oauth2")
                 || path.startsWith("/api/carpets/**")) {
             filterChain.doFilter(request, response);
             System.out.println("JwtFilter: Bỏ qua kiểm tra JWT cho route public: " + path);

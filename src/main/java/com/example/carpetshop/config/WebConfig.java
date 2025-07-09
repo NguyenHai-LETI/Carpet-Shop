@@ -1,23 +1,24 @@
 package com.example.carpetshop.config;
 
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    @Value("${frontend.origin}")
-    private String frontendOrigin;
-    
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
+        if (allowedOrigins == null || allowedOrigins.isEmpty()) {
+            allowedOrigins = "https://carpetshop-fe.netlify.app,http://localhost:3000"; // fallback
+        }
+        
         registry.addMapping("/**")
-                .allowedOrigins(frontendOrigin) // Cho phép frontend từ localhost:3000
+                .allowedOrigins(allowedOrigins.split(","))
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowCredentials(true)
-                .allowedHeaders("*");
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
 

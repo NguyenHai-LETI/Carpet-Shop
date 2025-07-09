@@ -12,22 +12,22 @@ public class MailConfig {
 
     @Bean
     public JavaMailSender javaMailSender() {
-        System.out.println("🔧 Configuring JavaMailSender for SendGrid...");
+        System.out.println("🔧 Configuring JavaMailSender for Gmail...");
         
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.sendgrid.net");
+        mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("apikey");
+        mailSender.setUsername("carpetshop.reply@gmail.com");
         
-        // Get API key from environment variable
-        String apiKey = System.getenv("SENDGRID_API_KEY");
-        if (apiKey == null || apiKey.isEmpty()) {
-            System.err.println("❌ SENDGRID_API_KEY environment variable is not set!");
-            throw new RuntimeException("SENDGRID_API_KEY environment variable is required");
+        // Get Gmail App Password from environment variable
+        String appPassword = System.getenv("GMAIL_APP_PASSWORD");
+        if (appPassword == null || appPassword.isEmpty()) {
+            System.err.println("❌ GMAIL_APP_PASSWORD environment variable is not set!");
+            throw new RuntimeException("GMAIL_APP_PASSWORD environment variable is required");
         }
         
-        System.out.println("🔧 API Key exists: " + (apiKey != null && !apiKey.isEmpty()));
-        mailSender.setPassword(apiKey);
+        System.out.println("🔧 Gmail App Password exists: " + (appPassword != null && !appPassword.isEmpty()));
+        mailSender.setPassword(appPassword);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
@@ -35,7 +35,7 @@ public class MailConfig {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.debug", "true");
 
-        System.out.println("🔧 JavaMailSender configured successfully!");
+        System.out.println("🔧 JavaMailSender configured successfully for Gmail!");
         return mailSender;
     }
 } 

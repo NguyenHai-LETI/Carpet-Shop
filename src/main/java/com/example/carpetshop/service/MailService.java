@@ -1,49 +1,39 @@
 package com.example.carpetshop.service;
 
-
-import org.springframework.beans.factory.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MailService {
+
     @Autowired
     private JavaMailSender mailSender;
 
     public void sendOrderConfirmationEmail(String to, String subject, String content) {
         try {
+            System.out.println("📧 Sending email to: " + to);
+            
             // Get from email from environment variable
-            String from = System.getenv("SENDGRID_FROM_EMAIL");
-            if (from == null || from.isEmpty()) {
-                from = "carpetshop.reply@gmail.com"; // fallback
+            String fromEmail = System.getenv("GMAIL_FROM_EMAIL");
+            if (fromEmail == null || fromEmail.isEmpty()) {
+                fromEmail = "carpetshop.reply@gmail.com"; // fallback
             }
             
-            System.out.println("📧 Attempting to send email to: " + to);
-            System.out.println("📧 From: " + from);
-            System.out.println("📧 Subject: " + subject);
-            System.out.println("📧 Mail sender class: " + mailSender.getClass().getName());
-            
-            // Debug environment variables
-            System.out.println("🔍 Environment check:");
-            System.out.println("🔍 SENDGRID_API_KEY exists: " + (System.getenv("SENDGRID_API_KEY") != null));
-            System.out.println("🔍 SENDGRID_FROM_EMAIL: " + System.getenv("SENDGRID_FROM_EMAIL"));
-            
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(from);
+            message.setFrom(fromEmail);
             message.setTo(to);
             message.setSubject(subject);
             message.setText(content);
             
-            System.out.println("📧 Message prepared, attempting to send...");
             mailSender.send(message);
+            System.out.println("✅ Email sent successfully to: " + to);
             
-            System.out.println("✅ Email sent successfully!");
         } catch (Exception e) {
-            System.err.println("❌ Email sending failed: " + e.getMessage());
-            System.err.println("❌ Exception type: " + e.getClass().getName());
+            System.err.println("❌ Failed to send email: " + e.getMessage());
             e.printStackTrace();
-            throw e; // Re-throw để OrderService có thể handle
+            throw new RuntimeException("Failed to send email", e);
         }
     }
 }

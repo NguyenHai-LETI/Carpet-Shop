@@ -1,7 +1,6 @@
 package com.example.carpetshop.controller;
 
 import com.example.carpetshop.dto.LoginRequest;
-import com.example.carpetshop.dto.LoginResponse;
 import com.example.carpetshop.dto.RegisterRequest;
 import com.example.carpetshop.dto.UserDTO;
 import com.example.carpetshop.entity.User;
@@ -121,5 +120,16 @@ public class AuthController {
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Lỗi xác thực: " + ex.getMessage());
         }
+    }
+
+    @GetMapping("/oauth2/authorization/google")
+    public ResponseEntity<?> redirectToGoogle() {
+        String frontendUrl = System.getenv("FRONTEND_URL");
+        if (frontendUrl == null || frontendUrl.isEmpty()) {
+            frontendUrl = "http://localhost:3000"; // fallback
+        }
+        
+        String googleAuthUrl = frontendUrl + "/oauth2/authorization/google";
+        return ResponseEntity.ok().body("Redirect to: " + googleAuthUrl);
     }
 }
