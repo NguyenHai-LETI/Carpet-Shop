@@ -21,6 +21,11 @@ public class MailService {
             System.out.println("📧 Subject: " + subject);
             System.out.println("📧 Mail sender class: " + mailSender.getClass().getName());
             
+            // Debug environment variables
+            System.out.println("🔍 Environment check:");
+            System.out.println("🔍 SENDGRID_API_KEY exists: " + (System.getenv("SENDGRID_API_KEY") != null));
+            System.out.println("🔍 SENDGRID_FROM_EMAIL: " + System.getenv("SENDGRID_FROM_EMAIL"));
+            
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(from);
             message.setTo(to);
