@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CarpetRepository extends JpaRepository<Carpet, Long>, CarpetRepositoryCustom {
+    /**
+     * Fetches carpets with main and hover images and min price. Does NOT fetch colors/types; service layer will handle those fields.
+     */
     @Query("""
 SELECT new com.example.carpetshop.dto.CarpetDTO(
     c.id,
@@ -39,5 +42,7 @@ FROM Carpet c
 """)
     List<CarpetDTO> findAllWithMainAndHoverImage();
 
+    // JPQL join fetch for eager loading all relations needed for homepage
+    List<Carpet> findAllWithAllRelations();
 }
 

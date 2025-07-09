@@ -18,6 +18,9 @@ public class Carpet {
     @OneToMany(mappedBy = "carpet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CarpetColorOption> colorOptions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "carpet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CarpetType> carpetTypes = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
@@ -56,5 +59,13 @@ public class Carpet {
 
     public void setColorOptions(List<CarpetColorOption> colorOptions) {
         this.colorOptions = colorOptions;
+    }
+
+    public List<CarpetType> getCarpetTypes() {
+        return carpetTypes;
+    }
+
+    public void setCarpetTypes(List<CarpetType> carpetTypes) {
+        this.carpetTypes = carpetTypes;
     }
 }

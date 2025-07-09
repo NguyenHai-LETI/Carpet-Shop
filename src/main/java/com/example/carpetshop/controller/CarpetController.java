@@ -23,7 +23,7 @@ public class CarpetController {
 
     @GetMapping("/with-image")
     public List<CarpetDTO> getAllCarpetsWithImage() {
-            return carpetRepository.findAllWithMainAndHoverImage();
+        return carpetService.getAllCarpetDTOsForHomepage();
     }
 
 

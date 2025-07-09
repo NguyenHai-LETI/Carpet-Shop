@@ -35,7 +35,7 @@ public class CarpetService {
         // Lấy ảnh từ CarpetColorOption -> Img
         List<String> imageUrls = carpet.getColorOptions().stream()
                 .flatMap(opt -> opt.getImages().stream())
-                .map(Img::getUrl)
+                .map(img -> img.getUrl())
                 .distinct()
                 .collect(Collectors.toList());
         dto.setImageUrls(imageUrls);
@@ -85,6 +85,42 @@ public class CarpetService {
         types = types == null ? Collections.emptyList() : types;
         return carpetRepository.findFilteredCarpets(keyword, sizes, colors, types, sort);
     }
+
+    public List<CarpetDTO> getAllCarpetDTOsForHomepage() {
+        List<CarpetDTO> baseList = carpetRepository.findAllWithMainAndHoverImage();
+        // Fetch đầy đủ Carpet với các quan hệ (tránh N+1 bằng join fetch nếu cần tối ưu hơn)
+        List<Carpet> carpets = carpetRepository.findAllWithAllRelations();
+        Map<Long, Carpet> carpetMap = new HashMap<>();
+        for (Carpet c : carpets) {
+            // ép fetch các quan hệ
+            c.getColorOptions().size();
+            c.getCarpetTypes().size();
+            carpetMap.put(c.getId(), c);
+        }
+        for (CarpetDTO dto : baseList) {
+            Carpet carpet = carpetMap.get(dto.getId());
+            if (carpet != null) {
+                // Lấy list màu sắc
+                List<String> colors = carpet.getColorOptions() != null ?
+                    carpet.getColorOptions().stream()
+                        .map(opt -> opt.getColor() != null ? opt.getColor().getValue() : null)
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .collect(Collectors.toList()) : new ArrayList<>();
+                dto.setColors(colors);
+                // Lấy list loại
+                List<String> types = carpet.getCarpetTypes() != null ?
+                    carpet.getCarpetTypes().stream()
+                        .map(ct -> ct.getType() != null ? ct.getType().getValue() : null)
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .collect(Collectors.toList()) : new ArrayList<>();
+                dto.setTypes(types);
+            }
+        }
+        return baseList;
+    }
+
     public List<CarpetSummaryDTO> getCarpetSummaries() {
         List<Carpet> carpets = carpetRepository.findAll();
 

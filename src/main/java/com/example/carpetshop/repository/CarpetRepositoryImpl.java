@@ -7,6 +7,7 @@ import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import com.example.carpetshop.entity.Carpet;
 
 @Repository
 public class CarpetRepositoryImpl implements CarpetRepositoryCustom {
@@ -122,5 +123,15 @@ public class CarpetRepositoryImpl implements CarpetRepositoryCustom {
         }
 
         return new ArrayList<>(uniqueMap.values());
+    }
+
+    // Eagerly fetch all relations needed for homepage
+    public List<Carpet> findAllWithAllRelations() {
+        String jpql = """
+            SELECT DISTINCT c FROM Carpet c
+            LEFT JOIN FETCH c.colorOptions co
+            LEFT JOIN FETCH co.color col
+        """;
+        return entityManager.createQuery(jpql, com.example.carpetshop.entity.Carpet.class).getResultList();
     }
 }
