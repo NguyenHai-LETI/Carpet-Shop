@@ -11,11 +11,14 @@ public class MailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${carpetshop.mail.from}")
-    private String from;
-
     public void sendOrderConfirmationEmail(String to, String subject, String content) {
         try {
+            // Get from email from environment variable
+            String from = System.getenv("SENDGRID_FROM_EMAIL");
+            if (from == null || from.isEmpty()) {
+                from = "carpetshop.reply@gmail.com"; // fallback
+            }
+            
             System.out.println("📧 Attempting to send email to: " + to);
             System.out.println("📧 From: " + from);
             System.out.println("📧 Subject: " + subject);
