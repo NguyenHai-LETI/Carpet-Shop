@@ -50,9 +50,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         
         // Redirect về frontend với token
         String frontendUrl = System.getenv("FRONTEND_URL");
-        if (frontendUrl == null || frontendUrl.isEmpty()) {
-            frontendUrl = "http://localhost:3000"; // fallback
-        }
         
         String redirectUrl = frontendUrl + "/oauth-success?token=" + token;
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);

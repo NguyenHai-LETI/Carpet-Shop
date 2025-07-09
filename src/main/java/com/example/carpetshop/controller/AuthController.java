@@ -125,9 +125,6 @@ public class AuthController {
     @GetMapping("/oauth2/authorization/google")
     public ResponseEntity<?> redirectToGoogle() {
         String frontendUrl = System.getenv("FRONTEND_URL");
-        if (frontendUrl == null || frontendUrl.isEmpty()) {
-            frontendUrl = "http://localhost:3000"; // fallback
-        }
         
         String googleAuthUrl = frontendUrl + "/oauth2/authorization/google";
         return ResponseEntity.ok().body("Redirect to: " + googleAuthUrl);
