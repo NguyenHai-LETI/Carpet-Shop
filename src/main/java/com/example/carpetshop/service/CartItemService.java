@@ -67,7 +67,9 @@ public class CartItemService {
                     .orElse(null);
 
             return new CartItemDTO(
-                    item.getId(),
+                    item.getId(), // id của CartItem
+                    variant.getId(), // id của CarpetOption (variantId)
+                    carpet.getId(), // productId
                     carpet.getName(),
                     variant.getSize().getValue(),
                     colorOption.getColor().getValue(),

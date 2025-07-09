@@ -12,6 +12,7 @@ public class CarpetDetailDTO {
     private List<String> types;
     private List<String> colors;
     private List<VariantOptionDTO> variantOptions;
+    private String mainImageUrl;
 
 
     public List<VariantOptionDTO> getVariantOptions() {
@@ -85,6 +86,13 @@ public class CarpetDetailDTO {
 
     public void setColors(List<String> colors) {
         this.colors = colors;
+    }
+
+    public String getMainImageUrl() {
+        return mainImageUrl;
+    }
+    public void setMainImageUrl(String mainImageUrl) {
+        this.mainImageUrl = mainImageUrl;
     }
     // Getters, setters...
 }

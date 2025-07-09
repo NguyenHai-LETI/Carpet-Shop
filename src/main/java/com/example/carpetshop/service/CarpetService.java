@@ -21,7 +21,7 @@ public class CarpetService {
     @Autowired
     private CarpetRepository carpetRepository;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public CarpetDetailDTO getCarpetDetailById(Long id) {
         Carpet carpet = carpetRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thảm"));
@@ -32,34 +32,44 @@ public class CarpetService {
         dto.setOrigin(carpet.getOrigin());
         dto.setShortDescription(carpet.getShortDesc());
 
-        // Lấy ảnh từ CarpetColorOption -> Img
-        List<String> imageUrls = carpet.getColorOptions().stream()
-                .flatMap(opt -> opt.getImages().stream())
-                .map(img -> img.getUrl())
-                .distinct()
-                .collect(Collectors.toList());
-        dto.setImageUrls(imageUrls);
-
-        // Lấy Color
-        List<String> colors = carpet.getColorOptions().stream()
+        // Lấy danh sách các màu sắc
+        List<CarpetColorOption> colorOptions = carpet.getColorOptions();
+        List<String> colors = colorOptions.stream()
                 .map(opt -> opt.getColor().getValue())
                 .distinct()
                 .collect(Collectors.toList());
         dto.setColors(colors);
+
+        // Chọn màu đầu tiên làm mặc định (có thể sửa lại nếu FE truyền màu sắc vào)
+        CarpetColorOption selectedColorOption = colorOptions.isEmpty() ? null : colorOptions.get(0);
+        if (selectedColorOption != null) {
+            // Lấy danh sách ảnh của màu sắc được chọn
+            List<String> imageUrls = selectedColorOption.getImages().stream()
+                    .map(Img::getUrl)
+                    .collect(Collectors.toList());
+            dto.setImageUrls(imageUrls);
+            // Lấy ảnh chính (isMain=true)
+            String mainImageUrl = selectedColorOption.getImages().stream()
+                    .filter(Img::isMain)
+                    .map(Img::getUrl)
+                    .findFirst()
+                    .orElse(imageUrls.isEmpty() ? null : imageUrls.get(0));
+            dto.setMainImageUrl(mainImageUrl);
+        } else {
+            dto.setImageUrls(new ArrayList<>());
+            dto.setMainImageUrl(null);
+        }
 
         // Lấy Size, Type, và VariantOptions
         Set<String> sizes = new HashSet<>();
         Set<String> types = new HashSet<>();
         List<VariantOptionDTO> variantOptions = new ArrayList<>();
 
-        for (CarpetColorOption colorOption : carpet.getColorOptions()) {
+        for (CarpetColorOption colorOption : colorOptions) {
             String color = colorOption.getColor().getValue();
-
             for (CarpetOption option : colorOption.getOptions()) {
                 String size = option.getSize().getValue();
-
                 sizes.add(size);
-
                 VariantOptionDTO variantDTO = new VariantOptionDTO(
                         option.getId(),
                         color,
@@ -71,11 +81,9 @@ public class CarpetService {
                 variantOptions.add(variantDTO);
             }
         }
-
         dto.setSizes(new ArrayList<>(sizes));
         dto.setTypes(new ArrayList<>(types));
         dto.setVariantOptions(variantOptions);
-
         return dto;
     }
 

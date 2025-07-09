@@ -2,6 +2,8 @@ package com.example.carpetshop.dto;
 
 public class CartItemDTO {
     private Long id;
+    private Long variantId;
+    private Long productId;
     private String productName;
     private String size;
     private String color;
@@ -10,8 +12,10 @@ public class CartItemDTO {
     private String imageUrl;
 
     // Constructor
-    public CartItemDTO(Long id, String productName,  String size, String color, Integer quantity, double price, String imageUrl) {
+    public CartItemDTO(Long id, Long variantId, Long productId, String productName, String size, String color, Integer quantity, double price, String imageUrl) {
         this.id = id;
+        this.variantId = variantId;
+        this.productId = productId;
         this.productName = productName;
         this.size = size;
         this.color = color;
@@ -77,5 +81,19 @@ public class CartItemDTO {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Long getVariantId() {
+        return variantId;
+    }
+    public void setVariantId(Long variantId) {
+        this.variantId = variantId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

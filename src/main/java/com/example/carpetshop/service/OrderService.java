@@ -12,6 +12,8 @@ import com.example.carpetshop.repository.CarpetOptionRepository;
 import com.example.carpetshop.repository.OrderItemRepository;
 import com.example.carpetshop.repository.OrderRepository;
 import com.example.carpetshop.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +45,9 @@ public class OrderService {
     @Autowired
     private MailService mailService;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Transactional
     public Order placeOrder(OrderRequest request) {
         if (request.getUserId() == null) {
@@ -57,20 +62,24 @@ public class OrderService {
 
         for (OrderRequest.ItemRequest itemReq : request.getItems()) {
             if (itemReq.getCarpetOptionId() == null) {
-                throw new RuntimeException("Missing product variant ID");
+                throw new RuntimeException("Missing product variant ID (carpetOptionId) in order item: " + itemReq);
             }
 
             CarpetOption option = carpetOptionRepository.findById(itemReq.getCarpetOptionId())
-                    .orElseThrow(() -> new RuntimeException("Product variant not found"));
+                    .orElseThrow(() -> new RuntimeException("Product variant not found: id=" + itemReq.getCarpetOptionId()));
 
             int currentStock = option.getStock() != null ? option.getStock() : 0;
+            System.out.println("===> [ORDER] CarpetOptionId: " + itemReq.getCarpetOptionId() + ", CurrentStock: " + currentStock + ", Quantity: " + itemReq.getQuantity());
             int newStock = currentStock - itemReq.getQuantity();
             if (newStock < 0) {
-                throw new RuntimeException("Insufficient stock");
+                String errMsg = String.format("Insufficient stock for variantId=%d. Current stock: %d, requested: %d", itemReq.getCarpetOptionId(), currentStock, itemReq.getQuantity());
+                System.err.println("❌ " + errMsg);
+                throw new RuntimeException(errMsg);
             }
 
             option.setStock(newStock);
             carpetOptionRepository.saveAndFlush(option);
+            System.out.println("===> [ORDER] After update: CarpetOptionId: " + itemReq.getCarpetOptionId() + ", NewStock: " + newStock);
 
             totalProductPrice += option.getPrice() * itemReq.getQuantity();
 
@@ -107,6 +116,9 @@ public class OrderService {
             System.err.println("⚠️ Failed to send email: " + e.getMessage());
             // Không throw exception để không làm crash order
         }
+
+        // Clear JPA cache để đảm bảo lần fetch tiếp theo lấy dữ liệu mới nhất
+        entityManager.clear();
 
         return order;
     }
