@@ -23,13 +23,19 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-
-
     @PostMapping
-    public ResponseEntity<OrderSuccessResponseDTO> placeOrder(@RequestBody OrderRequest request) {
-        OrderSuccessResponseDTO response = orderService.placeOrderAndReturnDetails(request);
-        cartItemService.clearCartByUserId(request.getUserId());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> placeOrder(@RequestBody OrderRequest request) {
+        try {
+            System.out.println("🔄 Processing order request: " + request.getUserId());
+            OrderSuccessResponseDTO response = orderService.placeOrderAndReturnDetails(request);
+            cartItemService.clearCartByUserId(request.getUserId());
+            System.out.println("✅ Order placed successfully for user: " + request.getUserId());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("❌ Error placing order: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Order failed: " + e.getMessage());
+        }
     }
 
     @GetMapping
@@ -37,6 +43,4 @@ public class OrderController {
     public ResponseEntity<List<OrderDTO>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrdersWithCustomerName());
     }
-
-
 }

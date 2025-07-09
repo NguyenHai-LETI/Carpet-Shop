@@ -98,9 +98,15 @@ public class OrderService {
         }
 
         // Gửi email xác nhận đơn hàng
-        String subject = "Xác nhận đơn hàng #" + order.getOrderId();
-        String content = buildEmailContent(order, user);
-        mailService.sendOrderConfirmationEmail(user.getUsername(), subject, content);
+        try {
+            String subject = "Xác nhận đơn hàng #" + order.getOrderId();
+            String content = buildEmailContent(order, user);
+            mailService.sendOrderConfirmationEmail(user.getUsername(), subject, content);
+            System.out.println("📧 Email sent successfully to: " + user.getUsername());
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send email: " + e.getMessage());
+            // Không throw exception để không làm crash order
+        }
 
         return order;
     }
