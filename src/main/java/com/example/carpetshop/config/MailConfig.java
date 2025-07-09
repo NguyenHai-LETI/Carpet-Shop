@@ -1,6 +1,5 @@
 package com.example.carpetshop.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,31 +10,24 @@ import java.util.Properties;
 @Configuration
 public class MailConfig {
 
-    @Value("${spring.mail.host}")
-    private String host;
-
-    @Value("${spring.mail.port}")
-    private int port;
-
-    @Value("${spring.mail.username}")
-    private String username;
-
-    @Value("${spring.mail.password}")
-    private String password;
-
     @Bean
     public JavaMailSender javaMailSender() {
-        System.out.println("🔧 Configuring JavaMailSender...");
-        System.out.println("🔧 Host: " + host);
-        System.out.println("🔧 Port: " + port);
-        System.out.println("🔧 Username: " + username);
-        System.out.println("🔧 Password exists: " + (password != null && !password.isEmpty()));
+        System.out.println("🔧 Configuring JavaMailSender for SendGrid...");
         
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(host);
-        mailSender.setPort(port);
-        mailSender.setUsername(username);
-        mailSender.setPassword(password);
+        mailSender.setHost("smtp.sendgrid.net");
+        mailSender.setPort(587);
+        mailSender.setUsername("apikey");
+        
+        // Get API key from environment variable
+        String apiKey = System.getenv("SENDGRID_API_KEY");
+        if (apiKey == null || apiKey.isEmpty()) {
+            System.err.println("❌ SENDGRID_API_KEY environment variable is not set!");
+            throw new RuntimeException("SENDGRID_API_KEY environment variable is required");
+        }
+        
+        System.out.println("🔧 API Key exists: " + (apiKey != null && !apiKey.isEmpty()));
+        mailSender.setPassword(apiKey);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
