@@ -9,6 +9,7 @@ import com.example.carpetshop.util.JwtUtil;
 
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -119,6 +120,39 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản không hợp lệ: " + ex.getMessage());
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Lỗi xác thực: " + ex.getMessage());
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request, @Value("${frontend.url:http://localhost:3000}") String frontendUrl) {
+        String email = request.get("email");
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.badRequest().body("Email không được để trống");
+        }
+        try {
+            // appUrl là url FE để người dùng bấm vào link reset
+            String appUrl = frontendUrl;
+            userService.createPasswordResetTokenAndSendMail(email, appUrl);
+            return ResponseEntity.ok("Đã gửi email đặt lại mật khẩu (nếu email tồn tại trong hệ thống)");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
+        if (token == null || newPassword == null || newPassword.isEmpty()) {
+            return ResponseEntity.badRequest().body("Token và mật khẩu mới không được để trống");
+        }
+        try {
+            userService.resetPassword(token, newPassword);
+            return ResponseEntity.ok("Đặt lại mật khẩu thành công!");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra: " + e.getMessage());
         }
     }
 

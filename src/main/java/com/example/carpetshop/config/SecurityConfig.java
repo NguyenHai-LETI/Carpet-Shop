@@ -78,6 +78,7 @@ public class SecurityConfig {
                                 "/login/oauth2/**",
                                 "/api/register",
                                 "/api/reset-password",
+                                "/api/forgot-password",
                                 "/api/carpets/**",
                                 "api/carpets/*",
                                 "/css/**", "/js/**", "/img/**", "/", "/error",
