@@ -80,7 +80,8 @@ public class SecurityConfig {
                                 "/api/reset-password",
                                 "/api/carpets/**",
                                 "api/carpets/*",
-                                "/css/**", "/js/**", "/img/**", "/", "/error"
+                                "/css/**", "/js/**", "/img/**", "/", "/error",
+                                "/uploads/avatars/**" // Cho phép truy cập ảnh avatar tự do
                         ).permitAll()
                         .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()

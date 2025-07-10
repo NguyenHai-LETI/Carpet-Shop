@@ -12,7 +12,7 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "avatar_url")
+    @Column(name = "avatar_url", columnDefinition = "TEXT")
     private String avatarUrl;
 
     private String username; // email
