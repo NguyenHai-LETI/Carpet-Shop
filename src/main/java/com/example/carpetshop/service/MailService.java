@@ -13,7 +13,7 @@ public class MailService {
 
     public void sendOrderConfirmationEmail(String to, String subject, String content) {
         try {
-            System.out.println("📧 Sending email to: " + to);
+            System.out.println("Sending email to: " + to);
             
             // Get from email from environment variable
             String fromEmail = System.getenv("GMAIL_FROM_EMAIL");
@@ -28,10 +28,10 @@ public class MailService {
             message.setText(content);
             
             mailSender.send(message);
-            System.out.println("✅ Email sent successfully to: " + to);
+            System.out.println("Email sent successfully to: " + to);
             
         } catch (Exception e) {
-            System.err.println("❌ Failed to send email: " + e.getMessage());
+            System.err.println("Failed to send email: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Failed to send email", e);
         }

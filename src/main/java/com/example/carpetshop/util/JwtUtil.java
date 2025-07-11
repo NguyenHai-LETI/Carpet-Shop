@@ -12,14 +12,14 @@ import java.util.List;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET = "012345678901234567890123456789012"; // ít nhất 32 ký tự
+    private static final String SECRET = "012345678901234567890123456789012"; //32 characters
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    // Phương thức tạo token với thêm role
+    // Tạo token với role
     public String generateToken(String username, List<String> roles) {
         return Jwts.builder()
-                .setSubject(username) // Lưu username vào claims
-                .claim("roles", roles) // Lưu roles vào claims
+                .setSubject(username) // Lưu username 
+                .claim("roles", roles) // Lưu roles 
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(Instant.now().plus(7, ChronoUnit.DAYS)))
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
@@ -44,7 +44,7 @@ public class JwtUtil {
         }
     }
 
-    // Kiểm tra token đã hết hạn chưa
+    // Kiểm tra token hết hạn
     private boolean isTokenExpired(String token) {
         Date expiration = Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CarpetOptionRepository extends JpaRepository<CarpetOption, Long> {
-    // Bạn có thể thêm các custom query sau này nếu cần
+    // Custom query có thể thêm sau
 }

@@ -32,7 +32,7 @@ public class CarpetService {
         dto.setOrigin(carpet.getOrigin());
         dto.setShortDescription(carpet.getShortDesc());
 
-        // Lấy danh sách các màu sắc
+        // Lấy danh sách màu sắc
         List<CarpetColorOption> colorOptions = carpet.getColorOptions();
         List<String> colors = colorOptions.stream()
                 .map(opt -> opt.getColor().getValue())

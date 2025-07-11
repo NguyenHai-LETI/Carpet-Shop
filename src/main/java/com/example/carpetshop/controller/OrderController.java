@@ -26,10 +26,10 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<?> placeOrder(@RequestBody OrderRequest request) {
         try {
-            System.out.println("🔄 Processing order request: " + request.getUserId());
+            System.out.println("Processing order request: " + request.getUserId());
             OrderSuccessResponseDTO response = orderService.placeOrderAndReturnDetails(request);
             cartItemService.clearCartByUserId(request.getUserId());
-            System.out.println("✅ Order placed successfully for user: " + request.getUserId());
+            System.out.println("Order placed successfully for user: " + request.getUserId());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.err.println("❌ Error placing order: " + e.getMessage());

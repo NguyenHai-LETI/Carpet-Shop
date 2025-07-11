@@ -69,7 +69,7 @@ public class OrderService {
                     .orElseThrow(() -> new RuntimeException("Product variant not found: id=" + itemReq.getCarpetOptionId()));
 
             int currentStock = option.getStock() != null ? option.getStock() : 0;
-            System.out.println("===> [ORDER] CarpetOptionId: " + itemReq.getCarpetOptionId() + ", CurrentStock: " + currentStock + ", Quantity: " + itemReq.getQuantity());
+            System.out.println("[ORDER] CarpetOptionId: " + itemReq.getCarpetOptionId() + ", CurrentStock: " + currentStock + ", Quantity: " + itemReq.getQuantity());
             int newStock = currentStock - itemReq.getQuantity();
             if (newStock < 0) {
                 String errMsg = String.format("Insufficient stock for variantId=%d. Current stock: %d, requested: %d", itemReq.getCarpetOptionId(), currentStock, itemReq.getQuantity());
@@ -79,7 +79,7 @@ public class OrderService {
 
             option.setStock(newStock);
             carpetOptionRepository.saveAndFlush(option);
-            System.out.println("===> [ORDER] After update: CarpetOptionId: " + itemReq.getCarpetOptionId() + ", NewStock: " + newStock);
+            System.out.println("[ORDER] After update: CarpetOptionId: " + itemReq.getCarpetOptionId() + ", NewStock: " + newStock);
 
             totalProductPrice += option.getPrice() * itemReq.getQuantity();
 
@@ -111,10 +111,10 @@ public class OrderService {
             String subject = "Xác nhận đơn hàng #" + order.getOrderId();
             String content = buildEmailContent(order, user);
             mailService.sendOrderConfirmationEmail(user.getUsername(), subject, content);
-            System.out.println("📧 Email sent successfully to: " + user.getUsername());
+            System.out.println("Email sent successfully to: " + user.getUsername());
         } catch (Exception e) {
             System.err.println("⚠️ Failed to send email: " + e.getMessage());
-            // Không throw exception để không làm crash order
+            
         }
 
         // Clear JPA cache để đảm bảo lần fetch tiếp theo lấy dữ liệu mới nhất
@@ -158,7 +158,7 @@ public class OrderService {
         );
     }
 
-    // Hàm tạo nội dung email xác nhận
+    // nội dung email xác nhận
     private String buildEmailContent(Order order, User user) {
         StringBuilder sb = new StringBuilder();
         sb.append("Xin chào ").append(user.getName()).append(",\n\n");

@@ -12,7 +12,7 @@ public class MailConfig {
 
     @Bean
     public JavaMailSender javaMailSender() {
-        System.out.println("🔧 Configuring JavaMailSender for Gmail...");
+        System.out.println("Configuring JavaMailSender for Gmail...");
         
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
@@ -26,7 +26,7 @@ public class MailConfig {
             throw new RuntimeException("GMAIL_APP_PASSWORD environment variable is required");
         }
         
-        System.out.println("🔧 Gmail App Password exists: " + (appPassword != null && !appPassword.isEmpty()));
+        System.out.println("Gmail App Password exists: " + (appPassword != null && !appPassword.isEmpty()));
         mailSender.setPassword(appPassword);
 
         Properties props = mailSender.getJavaMailProperties();
@@ -35,7 +35,7 @@ public class MailConfig {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.debug", "true");
 
-        System.out.println("🔧 JavaMailSender configured successfully for Gmail!");
+        System.out.println("JavaMailSender configured successfully for Gmail!");
         return mailSender;
     }
 } 

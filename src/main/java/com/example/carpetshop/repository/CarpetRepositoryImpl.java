@@ -22,7 +22,7 @@ public class CarpetRepositoryImpl implements CarpetRepositoryCustom {
         if (colors == null) colors = List.of();
         if (types == null) types = List.of();
 
-        // ======= Bước 1: Lấy các ID thỏa điều kiện =======
+        // Lấy các ID thỏa điều kiện
         StringBuilder idQuerySb = new StringBuilder("""
             SELECT DISTINCT c.id
             FROM Carpet c
@@ -59,7 +59,7 @@ public class CarpetRepositoryImpl implements CarpetRepositoryCustom {
             return new ArrayList<>();
         }
 
-        // ======= Bước 2: Lấy thông tin CarpetDTO + minPrice =======
+        //Lấy thông tin CarpetDTO + minPrice
         StringBuilder dtoQuerySb = new StringBuilder("""
             SELECT new com.example.carpetshop.dto.CarpetDTO(
                 c.id,
@@ -89,7 +89,7 @@ public class CarpetRepositoryImpl implements CarpetRepositoryCustom {
             WHERE c.id IN :ids
         """);
 
-        // === Sắp xếp ===
+        //sắp xếp
         if (sort != null) {
             switch (sort) {
                 case "name-asc" -> dtoQuerySb.append(" ORDER BY c.name ASC");

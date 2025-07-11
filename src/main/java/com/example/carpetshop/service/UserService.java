@@ -34,7 +34,7 @@ public class UserService implements UserDetailsService {
         com.example.carpetshop.entity.User u = new com.example.carpetshop.entity.User();
         u.setUsername(req.getEmail());
         u.setHashPassword(encoder.encode(req.getPassword()));
-        u.setRole(User.Role.USER); // hoặc ROLE_GUEST nếu bạn có enum đó
+        u.setRole(User.Role.USER); // hoặc ROLE_GUEST
         u.setCreatedAt(LocalDateTime.now());
         userRepo.save(u);
     }
@@ -44,7 +44,7 @@ public class UserService implements UserDetailsService {
         com.example.carpetshop.entity.User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng"));
 
-        // Sử dụng User từ Spring Security (org.springframework.security.core.userdetails.User)
+        // Sử dụng User từ Spring Security
         String password = user.getHashPassword() != null ? user.getHashPassword() : "";
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
@@ -59,7 +59,7 @@ public class UserService implements UserDetailsService {
     }
 
     public List<UserDTO> getAllUsers() {
-        List<User> users = userRepo.findAll(); // Đúng tên biến đã khai báo
+        List<User> users = userRepo.findAll(); 
         return users.stream().map(user -> new UserDTO(
                 user.getUserId(),
                 user.getUsername(),

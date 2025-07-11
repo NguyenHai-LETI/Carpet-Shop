@@ -47,11 +47,11 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Phần còn lại: kiểm tra JWT
+        //  kiểm tra JWT
         String authHeader = request.getHeader("Authorization");
         //check token from header of request
-        System.out.println("📥 [JwtFilter] Đường dẫn request: " + request.getRequestURI());
-        System.out.println("📥 [JwtFilter] Authorization Header: " + authHeader);
+        System.out.println("[JwtFilter] Đường dẫn request: " + request.getRequestURI());
+        System.out.println("[JwtFilter] Authorization Header: " + authHeader);
 
         String token = null;
         String username = null;
@@ -60,7 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             token = authHeader.substring(7);
             username = jwtUtil.extractUsername(token);
-            System.out.println("📥 [JwtFilter] Đã tách token: " + token);
+            System.out.println("[JwtFilter] Đã tách token: " + token);
 
         }
 
@@ -78,7 +78,7 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // Setter methods nếu cần set bằng tay
+
     public void setJwtUtil(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
