@@ -133,7 +133,7 @@ Frontend sẽ chạy tại: http://localhost:3000
 
 ## Cấu trúc Database
 
-![Database UML](carpetshop_be/database_UML.png)
+![Database UML](/database_UML.png)
 
 ### Các bảng chính:
 - **users** - Thông tin người dùng
