@@ -1,5 +1,5 @@
 # CarpetShop - Hệ thống bán thảm trực tuyến
-Live demo: carpetshop.netlify.app
+Live demo: https://carpetshop.netlify.app/
 
 ## Tổng quan
 
