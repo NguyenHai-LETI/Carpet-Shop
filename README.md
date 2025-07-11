@@ -3,7 +3,7 @@ Live demo: https://carpetshop.netlify.app/
 
 ## Tổng quan
 
-CarpetShop là một ứng dụng web bán thảm trực tuyến được xây dựng với kiến trúc microservices, bao gồm:
+CarpetShop là một ứng dụng web bán thảm trực tuyến được xây dựng với kiến trúc monolithic, bao gồm:
 
 - **Backend**: Spring Boot API với Java 21
 - **Frontend**: React.js với Bootstrap 5
